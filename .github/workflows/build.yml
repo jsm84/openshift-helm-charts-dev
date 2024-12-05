@@ -345,7 +345,7 @@ jobs:
         run: |
           commentBase64=$(base64 --wrap=0 ${{ steps.pr_comment.outputs.message-file }})
           echo "message-text-base64=${commentBase64}" | tee -a $GITHUB_OUTPUT
-        
+
       - name: Comment on PR
         if: ${{ always() && needs.setup.outputs.run_build == 'true' }}
         uses: actions/github-script@v7
@@ -388,7 +388,7 @@ jobs:
           # The token we use for this changes for the Sandbox repository because the sandbox repository
           # receives PRs from the openshift-helm-charts-bot, and that same bot cannot approve its own
           # PRs which breaks workflows. Instead, for the Sandbox repo, we approve with the GHA bot.
-          github-token: ${{ github.repository == 'openshift-helm-charts/sandbox' && secrets.GITHUB_TOKEN || secrets.BOT_TOKEN }}
+          github-token: ${{ github.repository == 'jsm84/openshift-helm-charts-sandbox' && secrets.GITHUB_TOKEN || secrets.BOT_TOKEN }}
 
       - name: Merge PR
         id: merge_pr
@@ -484,7 +484,7 @@ jobs:
               ${{ steps.prepare-chart-release.outputs.public_key_file }}
               ${{ steps.prepare-chart-release.outputs.path_to_chart_tarball }}
               ${{ steps.prepare-chart-release.outputs.prov_file_name }}
-          fail_on_unmatched_files: true 
+          fail_on_unmatched_files: true
 
       - name: Update Helm repository index
         if: ${{ needs.setup.outputs.run_build == 'true' }}
@@ -529,7 +529,7 @@ jobs:
 
       - name: Add a GitHub comment if release has failed
         uses: actions/github-script@v7
-        if: ${{ failure() && github.repository != 'openshift-helm-charts/sandbox' }}
+        if: ${{ failure() && github.repository != 'jsm84/openshift-helm-charts-sandbox' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -549,14 +549,14 @@ jobs:
       # This can be removed once the metrics execution is restructured to have access to the PR
       # comment, or pulled out of the release job entirely.
       - name: Retrieve PR comment for metrics
-        if: ${{ always() && needs.setup.outputs.run_build == 'true' && github.repository != 'openshift-helm-charts/sandbox' }}
+        if: ${{ always() && needs.setup.outputs.run_build == 'true' && github.repository != 'jsm84/openshift-helm-charts-sandbox' }}
         run: |
           mkdir -p $(dirname ${{ needs.chart-verifier.outputs.message_file }})
           echo ${{ needs.chart-verifier.outputs.message_text_base64 }} | base64 -d | tee ${{ needs.chart-verifier.outputs.message_file }}
 
       - name: Add metrics
         id: add_metrics
-        if: ${{ always() && needs.setup.outputs.run_build == 'true' && github.repository != 'openshift-helm-charts/sandbox' }}
+        if: ${{ always() && needs.setup.outputs.run_build == 'true' && github.repository != 'jsm84/openshift-helm-charts-sandbox' }}
         continue-on-error: true
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
